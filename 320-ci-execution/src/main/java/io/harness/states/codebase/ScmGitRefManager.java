@@ -39,19 +39,16 @@ public class ScmGitRefManager {
   private final Duration RETRY_SLEEP_DURATION = Duration.ofSeconds(2);
   private final int MAX_ATTEMPTS = 6;
 
-  public ScmGitRefTaskResponseData fetchCodebaseMetadataWithRetries(
+  public ScmGitRefTaskResponseData fetchCodebaseMetadata(
       ScmConnector scmConnector, String connectorIdentifier, String branch, String prNumber, String tag) {
     RetryPolicy<Object> retryPolicy = getRetryPolicy(
         format("[Retrying failed call to fetch codebase metadata: [%s], attempt: {}", connectorIdentifier),
         format("Failed call to fetch codebase metadata: [%s] after retrying {} times", connectorIdentifier));
-    return Failsafe.with(retryPolicy).get(() -> { return fetchCodebaseMetadata(scmConnector, branch, prNumber, tag); });
-  }
 
-  private ScmGitRefTaskResponseData fetchCodebaseMetadata(
-      ScmConnector scmConnector, String branch, String prNumber, String tag) {
     if (isNotEmpty(branch)) {
-      final GetLatestCommitResponse latestCommitResponse =
-          scmServiceClient.getLatestCommit(scmConnector, branch, null, scmBlockingStub);
+      final GetLatestCommitResponse latestCommitResponse = Failsafe.with(retryPolicy).get(() -> {
+        return scmServiceClient.getLatestCommit(scmConnector, branch, null, scmBlockingStub);
+      });
       ScmResponseStatusUtils.checkScmResponseStatusAndThrowException(
           latestCommitResponse.getStatus(), latestCommitResponse.getError());
       return ScmGitRefTaskResponseData.builder()
@@ -61,7 +58,9 @@ public class ScmGitRefManager {
           .getLatestCommitResponse(latestCommitResponse.toByteArray())
           .build();
     } else if (isNotEmpty(prNumber)) {
-      FindPRResponse findPRResponse = scmServiceClient.findPR(scmConnector, Long.parseLong(prNumber), scmBlockingStub);
+      FindPRResponse findPRResponse = Failsafe.with(retryPolicy).get(() -> {
+        return scmServiceClient.findPR(scmConnector, Long.parseLong(prNumber), scmBlockingStub);
+      });
       ListCommitsInPRResponse listCommitsInPRResponse =
           scmServiceClient.listCommitsInPR(scmConnector, Long.parseLong(prNumber), scmBlockingStub);
       return ScmGitRefTaskResponseData.builder()
@@ -71,8 +70,9 @@ public class ScmGitRefManager {
           .listCommitsInPRResponse(listCommitsInPRResponse.toByteArray())
           .build();
     } else if (isNotEmpty(tag)) {
-      final GetLatestCommitResponse latestCommitResponse =
-          scmServiceClient.getLatestCommit(scmConnector, null, tag, scmBlockingStub);
+      final GetLatestCommitResponse latestCommitResponse = Failsafe.with(retryPolicy).get(() -> {
+        return scmServiceClient.getLatestCommit(scmConnector, null, tag, scmBlockingStub);
+      });
       ScmResponseStatusUtils.checkScmResponseStatusAndThrowException(
           latestCommitResponse.getStatus(), latestCommitResponse.getError());
       return ScmGitRefTaskResponseData.builder()

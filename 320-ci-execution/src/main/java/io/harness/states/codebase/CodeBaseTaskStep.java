@@ -155,7 +155,7 @@ public class CodeBaseTaskStep implements TaskExecutable<CodeBaseTaskStepParamete
         try {
           ScmConnector scmConnector = scmGitRefManager.getScmConnector(connectorDetails,
               ngAccess.getAccountIdentifier(), stepParameters.getProjectName(), stepParameters.getRepoName());
-          ScmGitRefTaskResponseData response = scmGitRefManager.fetchCodebaseMetadataWithRetries(
+          ScmGitRefTaskResponseData response = scmGitRefManager.fetchCodebaseMetadata(
               scmConnector, connectorDetails.getIdentifier(), branch, prNumber, tag);
           saveScmResponseToSweepingOutput(ambiance, stepParameters, response);
           return StepResponse.builder().status(Status.SUCCEEDED).build();
