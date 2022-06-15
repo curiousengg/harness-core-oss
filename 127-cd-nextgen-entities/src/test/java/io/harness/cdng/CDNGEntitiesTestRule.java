@@ -1,3 +1,9 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
 
 /*
  * Copyright 2021 Harness Inc. All rights reserved.
@@ -17,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import io.harness.account.AccountClient;
 import io.harness.annotations.dev.HarnessTeam;
 import io.harness.annotations.dev.OwnedBy;
+import io.harness.cdng.gitops.service.ClusterService;
 import io.harness.connector.services.ConnectorService;
 import io.harness.entitysetupusageclient.remote.EntitySetupUsageClient;
 import io.harness.eventsframework.EventsFrameworkConstants;
@@ -29,6 +36,7 @@ import io.harness.govern.ServersModule;
 import io.harness.mongo.MongoPersistence;
 import io.harness.morphia.MorphiaRegistrar;
 import io.harness.ng.core.entitysetupusage.EntitySetupUsageModule;
+import io.harness.ng.core.infrastructure.services.InfrastructureEntityService;
 import io.harness.outbox.api.OutboxService;
 import io.harness.outbox.api.impl.OutboxDaoImpl;
 import io.harness.outbox.api.impl.OutboxServiceImpl;
@@ -185,6 +193,8 @@ public class CDNGEntitiesTestRule implements InjectorRuleMixin, MethodRule, Mong
         bind(Producer.class)
             .annotatedWith(Names.named(EventsFrameworkConstants.SETUP_USAGE))
             .toInstance(mock(NoOpProducer.class));
+        bind(ClusterService.class).toInstance(mock(ClusterService.class));
+        bind(InfrastructureEntityService.class).toInstance(mock(InfrastructureEntityService.class));
       }
     });
     modules.add(TimeModule.getInstance());
