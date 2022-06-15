@@ -12,6 +12,8 @@ import static io.harness.beans.execution.ExecutionSource.Type.WEBHOOK;
 import static io.harness.beans.sweepingoutputs.CISweepingOutputNames.CODEBASE;
 import static io.harness.data.structure.EmptyPredicate.isEmpty;
 import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
+import static io.harness.data.structure.HarnessStringUtils.emptyIfNull;
+import static io.harness.eraro.ErrorCode.GENERAL_ERROR;
 
 import static software.wings.beans.TaskType.SCM_GIT_REF_TASK;
 
@@ -29,16 +31,23 @@ import io.harness.beans.execution.WebhookExecutionSource;
 import io.harness.beans.sweepingoutputs.Build;
 import io.harness.beans.sweepingoutputs.CodebaseSweepingOutput;
 import io.harness.beans.sweepingoutputs.CodebaseSweepingOutput.CodeBaseCommit;
+import io.harness.delegate.beans.ErrorNotifyResponseData;
 import io.harness.delegate.beans.TaskData;
 import io.harness.delegate.beans.ci.pod.ConnectorDetails;
 import io.harness.delegate.beans.connector.scm.ScmConnector;
 import io.harness.delegate.task.scm.GitRefType;
 import io.harness.delegate.task.scm.ScmGitRefTaskParams;
 import io.harness.delegate.task.scm.ScmGitRefTaskResponseData;
+import io.harness.eraro.Level;
+import io.harness.exception.ExceptionUtils;
+import io.harness.exception.ngexception.CILiteEngineException;
 import io.harness.exception.ngexception.CIStageExecutionException;
 import io.harness.ng.core.NGAccess;
 import io.harness.pms.contracts.ambiance.Ambiance;
 import io.harness.pms.contracts.execution.Status;
+import io.harness.pms.contracts.execution.failure.FailureData;
+import io.harness.pms.contracts.execution.failure.FailureInfo;
+import io.harness.pms.contracts.execution.failure.FailureType;
 import io.harness.pms.contracts.execution.tasks.TaskRequest;
 import io.harness.pms.contracts.steps.StepCategory;
 import io.harness.pms.contracts.steps.StepType;
@@ -161,7 +170,10 @@ public class CodeBaseTaskStep implements TaskExecutable<CodeBaseTaskStepParamete
           return StepResponse.builder().status(Status.SUCCEEDED).build();
         } catch (Exception ex) {
           log.error("Failed to fetch codebase metadata", ex);
-          return StepResponse.builder().status(Status.FAILED).build();
+          return StepResponse.builder()
+              .status(Status.FAILED)
+              .failureInfo(FailureInfo.newBuilder().setErrorMessage(emptyIfNull(ex.getMessage())).build())
+              .build();
         }
       }
     }
