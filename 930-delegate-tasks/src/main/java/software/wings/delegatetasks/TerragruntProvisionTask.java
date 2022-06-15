@@ -334,24 +334,24 @@ public class TerragruntProvisionTask extends AbstractDelegateRunnableTask {
           throw ex;
         }
 
-        tfAutoApproveArgument = FORCE_FLAG;
-        if (parameters.isUseAutoApproveFlag()) {
-          String tfBinaryPath = getTfBinaryPath(tgInfoResponse);
-          tfAutoApproveArgument =
-              terragruntProvisionTaskHelper.getTfAutoApproveArgument(cliCommandRequestBuilder.build(), tfBinaryPath);
-        }
-        TerragruntCliCommandRequestParams cliCommandRequestParams =
-            cliCommandRequestBuilder.autoApproveArgument(tfAutoApproveArgument).build();
-
         if (terragruntCliResponse.getCommandExecutionStatus() == SUCCESS) {
           switch (parameters.getCommand()) {
             case APPLY: {
-              terragruntDelegateTaskOutput = terragruntApplyDestroyTaskHandler.executeApplyTask(
-                  parameters, cliCommandRequestParams, delegateLogService, planName, terraformConfigFileDirectoryPath);
+              terragruntDelegateTaskOutput = terragruntApplyDestroyTaskHandler.executeApplyTask(parameters,
+                  cliCommandRequestBuilder.build(), delegateLogService, planName, terraformConfigFileDirectoryPath);
               terragruntCliResponse = terragruntDelegateTaskOutput.getCliResponse();
               break;
             }
             case DESTROY: {
+              tfAutoApproveArgument = FORCE_FLAG;
+              if (parameters.isUseAutoApproveFlag()) {
+                String tfBinaryPath = getTfBinaryPath(tgInfoResponse);
+                tfAutoApproveArgument = terragruntProvisionTaskHelper.getTfAutoApproveArgument(
+                    cliCommandRequestBuilder.build(), tfBinaryPath);
+              }
+              TerragruntCliCommandRequestParams cliCommandRequestParams =
+                  cliCommandRequestBuilder.autoApproveArgument(tfAutoApproveArgument).build();
+
               terragruntDelegateTaskOutput = terragruntApplyDestroyTaskHandler.executeDestroyTask(
                   parameters, cliCommandRequestParams, delegateLogService, planName, terraformConfigFileDirectoryPath);
               terragruntCliResponse = terragruntDelegateTaskOutput.getCliResponse();

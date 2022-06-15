@@ -325,7 +325,7 @@ public class TerragruntProvisionTaskHelper {
 
   public String getTfAutoApproveArgument(TerragruntCliCommandRequestParams cliParams, String tfBinaryPath)
       throws IOException, InterruptedException, TimeoutException {
-    if (cliParams.isUseAutoApproveFlag()) {
+    if (!cliParams.isUseAutoApproveFlag()) {
       return FORCE_FLAG;
     }
     TerraformVersion version =

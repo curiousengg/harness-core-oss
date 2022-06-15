@@ -70,14 +70,6 @@ public class TerragruntRunAllTaskHandler {
     terragruntCliResponse = executeRunAllInitTaskInternal(
         provisionParameters, cliCommandRequestParams, targetArgs, varParams, uiLogs, delegateLogService);
 
-    if (cliCommandRequestParams.isUseAutoApproveFlag()) {
-      LogCallback initLogCallback = getLogCallback(delegateLogService, provisionParameters, INIT);
-      tgInfoResponse = terragruntClient.terragruntInfo(cliCommandRequestParams, initLogCallback);
-      String tfBinaryPath = getTfBinaryPath(tgInfoResponse);
-      tfAutoApproveArgument = provisionTaskHelper.getTfAutoApproveArgument(cliCommandRequestParams, tfBinaryPath);
-    }
-    cliCommandRequestParams.setAutoApproveArgument(tfAutoApproveArgument);
-
     switch (provisionParameters.getCommand()) {
       case APPLY: {
         if (terragruntCliResponse.getCommandExecutionStatus() == SUCCESS) {
@@ -92,6 +84,14 @@ public class TerragruntRunAllTaskHandler {
         break;
       }
       case DESTROY: {
+        if (cliCommandRequestParams.isUseAutoApproveFlag()) {
+          LogCallback initLogCallback = getLogCallback(delegateLogService, provisionParameters, INIT);
+          tgInfoResponse = terragruntClient.terragruntInfo(cliCommandRequestParams, initLogCallback);
+          String tfBinaryPath = getTfBinaryPath(tgInfoResponse);
+          tfAutoApproveArgument = provisionTaskHelper.getTfAutoApproveArgument(cliCommandRequestParams, tfBinaryPath);
+        }
+        cliCommandRequestParams.setAutoApproveArgument(tfAutoApproveArgument);
+
         if (terragruntCliResponse.getCommandExecutionStatus() == SUCCESS) {
           if (provisionParameters.isRunPlanOnly()) {
             terragruntCliResponse = executeRunAllPDestroyPlanTaskInternal(provisionParameters, cliCommandRequestParams,
