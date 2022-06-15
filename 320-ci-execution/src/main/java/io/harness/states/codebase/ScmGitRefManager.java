@@ -4,6 +4,7 @@ import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
 
 import static java.lang.String.format;
 
+import io.harness.beans.DecryptableEntity;
 import io.harness.connector.helper.GitApiAccessDecryptionHelper;
 import io.harness.delegate.beans.ci.pod.ConnectorDetails;
 import io.harness.delegate.beans.connector.scm.ScmConnector;
@@ -90,8 +91,10 @@ public class ScmGitRefManager {
     String completeUrl = CodebaseUtils.getCompleteURLFromConnector(connectorDetails, projectName, repoName);
     scmConnector.setUrl(completeUrl);
 
-    secretUtils.decryptViaManager(GitApiAccessDecryptionHelper.getAPIAccessDecryptableEntity(scmConnector),
-        connectorDetails.getEncryptedDataDetails(), accountId, connectorDetails.getIdentifier());
+    final DecryptableEntity decryptedScmSpec =
+        secretUtils.decryptViaManager(GitApiAccessDecryptionHelper.getAPIAccessDecryptableEntity(scmConnector),
+            connectorDetails.getEncryptedDataDetails(), accountId, connectorDetails.getIdentifier());
+    GitApiAccessDecryptionHelper.setAPIAccessDecryptableEntity(scmConnector, decryptedScmSpec);
     return scmConnector;
   }
 
