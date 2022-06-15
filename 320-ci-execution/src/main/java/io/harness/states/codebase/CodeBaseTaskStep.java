@@ -36,6 +36,7 @@ import io.harness.delegate.task.scm.GitRefType;
 import io.harness.delegate.task.scm.ScmGitRefTaskParams;
 import io.harness.delegate.task.scm.ScmGitRefTaskResponseData;
 import io.harness.exception.ngexception.CIStageExecutionException;
+import io.harness.ng.core.NGAccess;
 import io.harness.pms.contracts.ambiance.Ambiance;
 import io.harness.pms.contracts.execution.Status;
 import io.harness.pms.contracts.execution.tasks.TaskRequest;
@@ -82,6 +83,8 @@ public class CodeBaseTaskStep implements TaskExecutable<CodeBaseTaskStepParamete
   @Inject private KryoSerializer kryoSerializer;
   @Inject private ConnectorUtils connectorUtils;
   @Inject private ExecutionSweepingOutputService executionSweepingOutputResolver;
+
+  @Inject private ScmGitRefManager scmGitRefManager;
 
   @Override
   public Class<CodeBaseTaskStepParameters> getStepParametersClass() {
@@ -131,6 +134,51 @@ public class CodeBaseTaskStep implements TaskExecutable<CodeBaseTaskStepParamete
       log.error("Failed to retrieve codebase info from returned delegate response");
     }
 
+    saveScmResponseToSweepingOutput(ambiance, stepParameters, scmGitRefTaskResponseData);
+    return StepResponse.builder().status(Status.SUCCEEDED).build();
+  }
+
+  @Override
+  public StepResponse executeSync(Ambiance ambiance, CodeBaseTaskStepParameters stepParameters,
+      StepInputPackage inputPackage, PassThroughData passThroughData) {
+    ExecutionSource executionSource = stepParameters.getExecutionSource();
+    if (executionSource.getType() == MANUAL) {
+      NGAccess ngAccess = AmbianceUtils.getNgAccess(ambiance);
+      ConnectorDetails connectorDetails =
+          connectorUtils.getConnectorDetails(ngAccess, stepParameters.getConnectorRef());
+      // fetch scm details via manager
+      if (connectorUtils.hasApiAccess(connectorDetails)) {
+        ManualExecutionSource manualExecutionSource = (ManualExecutionSource) executionSource;
+        String branch = manualExecutionSource.getBranch();
+        String prNumber = manualExecutionSource.getPrNumber();
+        String tag = manualExecutionSource.getTag();
+        try {
+          ScmConnector scmConnector = scmGitRefManager.getScmConnector(connectorDetails,
+              ngAccess.getAccountIdentifier(), stepParameters.getProjectName(), stepParameters.getRepoName());
+          ScmGitRefTaskResponseData response = scmGitRefManager.fetchCodebaseMetadataWithRetries(
+              scmConnector, connectorDetails.getIdentifier(), branch, prNumber, tag);
+          saveScmResponseToSweepingOutput(ambiance, stepParameters, response);
+          return StepResponse.builder().status(Status.SUCCEEDED).build();
+        } catch (Exception ex) {
+          log.error("Failed to fetch codebase metadata", ex);
+          return StepResponse.builder().status(Status.FAILED).build();
+        }
+      }
+    }
+
+    CodebaseSweepingOutput codebaseSweepingOutput = null;
+    if (executionSource.getType() == MANUAL) {
+      codebaseSweepingOutput = buildManualCodebaseSweepingOutput((ManualExecutionSource) executionSource);
+    } else if (executionSource.getType() == WEBHOOK) {
+      codebaseSweepingOutput = buildWebhookCodebaseSweepingOutput((WebhookExecutionSource) executionSource);
+    }
+    saveCodebaseSweepingOutput(ambiance, codebaseSweepingOutput);
+
+    return StepResponse.builder().status(Status.SUCCEEDED).build();
+  }
+
+  private void saveScmResponseToSweepingOutput(Ambiance ambiance, CodeBaseTaskStepParameters stepParameters,
+      ScmGitRefTaskResponseData scmGitRefTaskResponseData) throws InvalidProtocolBufferException {
     CodebaseSweepingOutput codebaseSweepingOutput = null;
     if (scmGitRefTaskResponseData != null
         && scmGitRefTaskResponseData.getGitRefType() == GitRefType.PULL_REQUEST_WITH_COMMITS) {
@@ -144,24 +192,6 @@ public class CodeBaseTaskStep implements TaskExecutable<CodeBaseTaskStepParamete
     if (codebaseSweepingOutput != null) {
       saveCodebaseSweepingOutput(ambiance, codebaseSweepingOutput);
     }
-
-    return StepResponse.builder().status(Status.SUCCEEDED).build();
-  }
-
-  @Override
-  public StepResponse executeSync(Ambiance ambiance, CodeBaseTaskStepParameters stepParameters,
-      StepInputPackage inputPackage, PassThroughData passThroughData) {
-    ExecutionSource executionSource = stepParameters.getExecutionSource();
-
-    CodebaseSweepingOutput codebaseSweepingOutput = null;
-    if (executionSource.getType() == MANUAL) {
-      codebaseSweepingOutput = buildManualCodebaseSweepingOutput((ManualExecutionSource) executionSource);
-    } else if (executionSource.getType() == WEBHOOK) {
-      codebaseSweepingOutput = buildWebhookCodebaseSweepingOutput((WebhookExecutionSource) executionSource);
-    }
-    saveCodebaseSweepingOutput(ambiance, codebaseSweepingOutput);
-
-    return StepResponse.builder().status(Status.SUCCEEDED).build();
   }
 
   @VisibleForTesting
@@ -196,7 +226,7 @@ public class CodeBaseTaskStep implements TaskExecutable<CodeBaseTaskStepParamete
           .scmConnector(scmConnector)
           .build();
     } else {
-      throw new CIStageExecutionException("Manual codebase git task needs at least PR number or branch");
+      throw new CIStageExecutionException("Manual codebase git task needs one of PR number, branch or tag");
     }
   }
 
