@@ -35,4 +35,6 @@ public class TerragruntCliCommandRequestParams {
   private PlanJsonLogOutputStream planJsonLogOutputStream;
   private ErrorLogOutputStream errorLogOutputStream;
   private boolean useAutoApproveFlag;
+  private String tfBinaryPath;
+  private String autoApproveArgument;
 }
