@@ -285,7 +285,7 @@ public class PerspectiveResource {
         PERSPECTIVE_CREATED, null, accountId, properties, Collections.singletonMap(AMPLITUDE, true), Category.GLOBAL);
     return ResponseDTO.newResponse(
         Failsafe.with(transactionRetryPolicy).get(() -> transactionTemplate.execute(status -> {
-          outboxService.save(new PerspectiveCreateEvent(ceView.getUuid(), ceView.toDTO()));
+          outboxService.save(new PerspectiveCreateEvent(ceViewCheck.getAccountId(), ceViewCheck.toDTO()));
           return ceViewCheck;
         })));
   }
