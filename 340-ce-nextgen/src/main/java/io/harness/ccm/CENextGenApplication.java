@@ -42,6 +42,7 @@ import io.harness.ng.core.CorrelationFilter;
 import io.harness.ng.core.exceptionmappers.GenericExceptionMapperV2;
 import io.harness.ng.core.exceptionmappers.JerseyViolationExceptionMapperV2;
 import io.harness.ng.core.exceptionmappers.WingsExceptionMapperV2;
+import io.harness.outbox.OutboxEventPollService;
 import io.harness.persistence.HPersistence;
 import io.harness.request.RequestContextFilter;
 import io.harness.resource.VersionInfoResource;
@@ -187,6 +188,7 @@ public class CENextGenApplication extends Application<CENextGenConfiguration> {
     registerScheduledJobs(injector);
     registerMigrations(injector);
     registerOasResource(configuration, environment, injector);
+    environment.lifecycle().manage(injector.getInstance(OutboxEventPollService.class));
     MaintenanceController.forceMaintenance(false);
     createConsumerThreadsToListenToEvents(environment, injector);
     initializeEnforcementSdk(injector);
