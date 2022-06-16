@@ -53,6 +53,7 @@ public final class TerragruntConstants {
   public static final String DESTROY_PLAN = "Destroy Plan";
   public static final String DESTROY = "Destroy";
   public static final String WRAP_UP = "Wrap Up";
+  public static final String SKIP_ROLLBACK = "skipRollback";
 
   public static final String FORCE_FLAG = "-force";
   public static final String TF_DEFAULT_BINARY_PATH = "terraform";
