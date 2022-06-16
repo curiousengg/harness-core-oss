@@ -32,8 +32,6 @@ import io.harness.cli.CliResponse;
 import io.harness.logging.CommandExecutionStatus;
 import io.harness.logging.LogCallback;
 import io.harness.terraform.TerraformClient;
-import io.harness.terraform.TerraformHelperUtils;
-import io.harness.terraform.beans.TerraformVersion;
 
 import software.wings.beans.LogColor;
 import software.wings.beans.LogWeight;
