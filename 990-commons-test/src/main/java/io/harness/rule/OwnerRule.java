@@ -256,6 +256,7 @@ public class OwnerRule implements TestRule {
   public static final String BHARAT_GOEL = "bharat.goel";
   public static final String DEEPAK_CHHIKARA = "deepak.chhikara";
   public static final String KAPIL = "kapil.choudhary";
+  public static final String KSHITIJ = "kshitij.rastogi";
   public static final String PAVIC = "slobodan.pavic";
   public static final String SHIVAM = "shivam.negi";
   public static final String VITALIE = "vitalie.safronovici";
@@ -275,7 +276,6 @@ public class OwnerRule implements TestRule {
   public static final String RAGHAV_GUPTA = "raghav.gupta";
   public static final String SOUMYAJIT = "soumyajit.das";
   public static final String vivekveman = "vivek.karnati";
-  public static final String ERSHAD_MOHAMMAD = "ershad.ali";
   public static final String TARUN_UBA = "tarun.uba";
   public static final String NAVEEN = "naveen.shukla";
   public static final String ERSHAD_MOHAMMAD = "ershad.ali";
@@ -345,6 +345,7 @@ public class OwnerRule implements TestRule {
           .put(KAMAL, defaultUserInfo(KAMAL).slack("UKFQ1PQBH").team(CV).build())
           .put(KANHAIYA, defaultUserInfo(KANHAIYA).slack("U01HFBAT8A2").team(CV).build())
           .put(KAPIL, defaultUserInfo(KAPIL).slack("U02E2J40E21").team(CV).build())
+          .put(KSHITIJ, defaultUserInfo(KSHITIJ).slack("U03JCAFK116").team(PL).build())
           .put(KARAN, defaultUserInfo(KARAN).slack("U015LRX21FD").team(PL).build())
           .put(LUCAS, defaultUserInfo(LUCAS).slack("U01C8MPTS2J").team(DEL).build())
           .put(MANKRIT, defaultUserInfo(MANKRIT).slack("U02U8PSRMB4").team(PL).build())
