@@ -1,9 +1,18 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
 package io.harness.cdng.creator.plan.envGroup;
 
 import static io.harness.annotations.dev.HarnessTeam.CDP;
 
 import io.harness.annotations.dev.OwnedBy;
+import io.harness.cdng.envGroup.beans.EnvironmentGroupConfig;
 import io.harness.cdng.envGroup.beans.EnvironmentGroupEntity;
+import io.harness.cdng.envGroup.mappers.EnvironmentGroupMapper;
 import io.harness.cdng.envGroup.services.EnvironmentGroupService;
 import io.harness.cdng.envGroup.yaml.EnvGroupPlanCreatorConfig;
 import io.harness.cdng.envgroup.yaml.EnvironmentGroupYaml;
@@ -59,10 +68,12 @@ public class EnvGroupPlanCreatorHelper {
 
     List<EnvironmentPlanCreatorConfig> envConfigs = new ArrayList<>();
     if (!envGroupYaml.isDeployToAll()) {
-      String mergedYaml = entity.get().getYaml();
+      EnvironmentGroupConfig envGroupConfig =
+          EnvironmentGroupMapper.toNGEnvironmentGroupConfig(entity.get().getYaml()).getEnvironmentGroupConfig();
       List<EnvironmentYamlV2> envV2Yamls = envGroupYaml.getEnvGroupConfig();
       for (EnvironmentYamlV2 envYaml : envV2Yamls) {
-        envConfigs.add(EnvironmentPlanCreatorConfigMapper.toEnvPlanCreatorConfigWithGitops(mergedYaml, envYaml, null));
+        envConfigs.add(
+            EnvironmentPlanCreatorConfigMapper.toEnvPlanCreatorConfigWithGitops(envGroupConfig, envYaml, null));
       }
     }
 
