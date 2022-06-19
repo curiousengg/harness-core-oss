@@ -124,11 +124,4 @@ public class ClusterPlanCreatorUtils {
     checkArgument(!environmentRef.isExpression(), "environment ref not resolved yet");
     return (String) environmentRef.fetchFinalValue();
   }
-
-  private String fetchEnvGroupRef(EnvGroupPlanCreatorConfig config) {
-    final ParameterField<String> ref = config.getEnvironmentGroupRef();
-    checkNotNull(ref, "environment group ref must be present");
-    checkArgument(!ref.isExpression(), "environment group ref not resolved yet");
-    return (String) ref.fetchFinalValue();
-  }
 }

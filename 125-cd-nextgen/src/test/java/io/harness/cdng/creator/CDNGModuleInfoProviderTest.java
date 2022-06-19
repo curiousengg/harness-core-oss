@@ -319,7 +319,7 @@ public class CDNGModuleInfoProviderTest extends CategoryTest {
                  .found(true)
                  .outcome(new GitopsClustersOutcome(new ArrayList<>())
                               .appendCluster(new Metadata("env1", "env1"), new Metadata("c1", "c1"))
-                              .appendCluster(new Metadata("env2", "env2"), new Metadata("c2", "c2")))
+                              .appendCluster(new Metadata("env1", "env1"), new Metadata("c2", "c2")))
                  .build())
         .when(outcomeService)
         .resolveOptional(ambiance, RefObjectUtils.getOutcomeRefObject("gitops"));
@@ -333,7 +333,57 @@ public class CDNGModuleInfoProviderTest extends CategoryTest {
   @Test
   @Owner(developers = OwnerRule.YOGESH)
   @Category(UnitTests.class)
-  public void testShouldRun() {}
+  public void testShouldRun_0() {
+    Ambiance ambiance = buildAmbiance(StepType.newBuilder()
+                                          .setType(ExecutionNodeType.GITOPS_CLUSTERS.getName())
+                                          .setStepCategory(StepCategory.STEP)
+                                          .build());
+    assertThat(provider.shouldRun(OrchestrationEvent.builder().ambiance(ambiance).status(Status.SUCCEEDED).build()))
+        .isTrue();
+
+    assertThat(provider.shouldRun(OrchestrationEvent.builder().ambiance(ambiance).status(Status.FAILED).build()))
+        .isTrue();
+
+    assertThat(provider.shouldRun(OrchestrationEvent.builder().ambiance(ambiance).status(Status.RUNNING).build()))
+        .isFalse();
+  }
+
+  @Test
+  @Owner(developers = OwnerRule.YOGESH)
+  @Category(UnitTests.class)
+  public void testShouldRun_1() {
+    Ambiance ambiance = buildAmbiance(StepType.newBuilder()
+                                          .setType(ExecutionNodeType.SERVICE_SECTION.getName())
+                                          .setStepCategory(StepCategory.STEP)
+                                          .build());
+    assertThat(provider.shouldRun(OrchestrationEvent.builder().ambiance(ambiance).status(Status.SUCCEEDED).build()))
+        .isTrue();
+
+    assertThat(provider.shouldRun(OrchestrationEvent.builder().ambiance(ambiance).status(Status.FAILED).build()))
+        .isTrue();
+
+    assertThat(provider.shouldRun(OrchestrationEvent.builder().ambiance(ambiance).status(Status.RUNNING).build()))
+        .isFalse();
+  }
+
+  @Test
+  @Owner(developers = OwnerRule.YOGESH)
+  @Category(UnitTests.class)
+  public void testShouldRun_2() {
+    Ambiance ambiance = buildAmbiance(StepType.newBuilder()
+                                          .setType(ExecutionNodeType.INFRASTRUCTURE.getName())
+                                          .setStepCategory(StepCategory.STEP)
+                                          .build());
+
+    assertThat(provider.shouldRun(OrchestrationEvent.builder().ambiance(ambiance).status(Status.SUCCEEDED).build()))
+        .isTrue();
+
+    assertThat(provider.shouldRun(OrchestrationEvent.builder().ambiance(ambiance).status(Status.FAILED).build()))
+        .isTrue();
+
+    assertThat(provider.shouldRun(OrchestrationEvent.builder().ambiance(ambiance).status(Status.RUNNING).build()))
+        .isFalse();
+  }
 
   public Ambiance buildAmbiance(StepType stepType) {
     final String PHASE_RUNTIME_ID = generateUuid();

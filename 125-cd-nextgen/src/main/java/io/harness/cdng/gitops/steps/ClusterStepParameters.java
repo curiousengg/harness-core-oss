@@ -7,8 +7,6 @@
 
 package io.harness.cdng.gitops.steps;
 
-import static java.util.Collections.singletonList;
-
 import io.harness.annotation.RecasterAlias;
 import io.harness.annotations.dev.HarnessTeam;
 import io.harness.annotations.dev.OwnedBy;

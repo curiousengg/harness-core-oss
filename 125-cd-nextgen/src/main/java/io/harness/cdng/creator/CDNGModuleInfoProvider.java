@@ -49,6 +49,7 @@ import com.google.inject.Singleton;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -190,14 +191,15 @@ public class CDNGModuleInfoProvider implements ExecutionSummaryModuleInfoProvide
           event.getAmbiance(), RefObjectUtils.getOutcomeRefObject(GitopsClustersStep.GITOPS_SWEEPING_OUTPUT));
       if (optionalOutcome != null && optionalOutcome.isFound()) {
         GitopsClustersOutcome gitopsOutcome = (GitopsClustersOutcome) optionalOutcome.getOutcome();
-        // envId -> envName
-        Map<String, String> envs = gitopsOutcome.getClustersData().stream().collect(
-            Collectors.toMap(GitopsClustersOutcome.ClusterData::getEnvId, GitopsClustersOutcome.ClusterData::getEnvName,
-                (k1, k2) -> k1));
+        // envId -> ClusterData
+        Map<String, GitopsClustersOutcome.ClusterData> envs = gitopsOutcome.getClustersData().stream().collect(
+            Collectors.toMap(GitopsClustersOutcome.ClusterData::getEnvId, Function.identity(), (k1, k2) -> k1));
         if (envs.size() == 1) {
           String envIdentifier = envs.keySet().iterator().next();
-          cdStageModuleInfoBuilder.infraExecutionSummary(
-              InfraExecutionSummary.builder().identifier(envIdentifier).name(envs.get(envIdentifier)).build());
+          cdStageModuleInfoBuilder.infraExecutionSummary(InfraExecutionSummary.builder()
+                                                             .identifier(envIdentifier)
+                                                             .name(envs.get(envIdentifier).getEnvName())
+                                                             .build());
         }
       }
     }
