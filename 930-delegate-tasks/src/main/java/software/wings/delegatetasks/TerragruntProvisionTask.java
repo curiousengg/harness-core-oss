@@ -294,7 +294,6 @@ public class TerragruntProvisionTask extends AbstractDelegateRunnableTask {
       CliResponse terragruntCliResponse;
       String terraformConfigFileDirectoryPath = EMPTY;
       TerragruntDelegateTaskOutput terragruntDelegateTaskOutput = null;
-      String tfAutoApproveArgument;
       CliResponse tgInfoResponse;
 
       if (parameters.isRunAll()) {
@@ -343,7 +342,7 @@ public class TerragruntProvisionTask extends AbstractDelegateRunnableTask {
               break;
             }
             case DESTROY: {
-              tfAutoApproveArgument = FORCE_FLAG;
+              String tfAutoApproveArgument = FORCE_FLAG;
               if (parameters.isUseAutoApproveFlag()) {
                 String tfBinaryPath = getTfBinaryPath(tgInfoResponse);
                 tfAutoApproveArgument = terragruntProvisionTaskHelper.getTfAutoApproveArgument(
