@@ -30,7 +30,7 @@ function create_and_push_docker_build(){
 	local_service_name="$1"
 	local_tag="$2"
   local_non_apm_image_path="${REGISTRY_PATH}/${REPO_PATH}/${local_service_name}:${local_tag}"
-  local_apm_image_path="${REGISTRY_PATH}/${REPO_PATH}/${APM_PATH}/${local_service_name}:${local_tag}"
+  local_apm_image_path="${REGISTRY_PATH}/${REPO_PATH}/${local_service_name}:${local_tag}"
 
   echo "INFO: Pulling Non APM IMAGE...."
 	docker pull "${local_non_apm_image_path}"; STATUS=$?
@@ -69,7 +69,7 @@ export OCELET_AGENT='https://github.com/inspectIT/inspectit-ocelot/releases/down
 
 export REGISTRY_PATH='us.gcr.io/platform-205701'
 export REPO_PATH=${REPO_PATH}
-export APM_PATH='apm-images'
+#export APM_PATH='apm-images'
 export VERSION=${VERSION}
 
 IMAGES_LIST=(manager ng-manager verification-service pipeline-service cv-nextgen ce-nextgen \
