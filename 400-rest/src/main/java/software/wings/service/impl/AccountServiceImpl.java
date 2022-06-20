@@ -2002,7 +2002,7 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   public AuthenticationInfo getAuthenticationInfo(String accountId) {
-    Account account = getFromCacheWithFallback(accountId);
+    Account account = get(accountId);
     if (account == null) {
       throw new InvalidRequestException("Account not found");
     }
@@ -2029,6 +2029,35 @@ public class AccountServiceImpl implements AccountService {
         // Nothing to do by default
     }
     return builder.build();
+  }
+
+  @Override
+  public boolean isAccountActivelyUsed(String accountId) {
+    Account account = getFromCacheWithFallback(accountId);
+    return account.isAccountActivelyUsed();
+  }
+
+  @Override
+  public boolean updateAccountActivelyUsed(String accountId, boolean accountActivelyUsed) {
+    Account account = getFromCache(accountId);
+    if (account == null) {
+      log.warn("accountId={} doesn't exist", accountId);
+      return false;
+    }
+    UpdateOperations<Account> updateOperations = persistence.createUpdateOperations(Account.class);
+
+    updateOperations.set(AccountKeys.accountActivelyUsed, accountActivelyUsed);
+    UpdateResults updateResults = persistence.update(
+            persistence.createQuery(Account.class).filter(Mapper.ID_KEY, accountId), updateOperations);
+
+    if (updateResults != null && updateResults.getUpdatedCount() > 0) {
+      log.info("Successfully set accountActivelyUsed to {} for accountId = {} ", accountActivelyUsed, accountId);
+      return true;
+    }
+
+    log.info("Failed to set accountActivelyUsed to {} for accountId = {} ", accountActivelyUsed, accountId);
+    return false;
+
   }
 
   @Override

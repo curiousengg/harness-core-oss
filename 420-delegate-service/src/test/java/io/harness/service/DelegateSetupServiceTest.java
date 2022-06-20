@@ -57,6 +57,7 @@ import io.harness.service.intfc.DelegateInsightsService;
 import software.wings.beans.DelegateConnection;
 import software.wings.beans.SelectorType;
 
+import com.google.common.collect.Sets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
@@ -68,7 +69,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import jersey.repackaged.com.google.common.collect.Sets;
 import org.apache.groovy.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
@@ -230,8 +230,6 @@ public class DelegateSetupServiceTest extends DelegateServiceTestBase {
         assertThat(group.getDelegateInstanceDetails())
             .extracting(DelegateGroupListing.DelegateInner::getUuid)
             .containsOnly(delegate1.getUuid(), delegate2.getUuid());
-        assertThat(group.getDelegateInsightsDetails()).isNotNull();
-        assertThat(group.getDelegateInsightsDetails().getInsights()).hasSize(2);
       } else if (group.getGroupName().equals("grp2")) {
         assertThat(group.getConnectivityStatus()).isEqualTo("disconnected");
         assertThat(group.getDelegateInstanceDetails())
@@ -537,8 +535,6 @@ public class DelegateSetupServiceTest extends DelegateServiceTestBase {
     assertThat(delegateGroupDetails.getDelegateInstanceDetails())
         .extracting(DelegateGroupListing.DelegateInner::isActivelyConnected)
         .containsOnly(true, false);
-    assertThat(delegateGroupDetails.getDelegateInsightsDetails()).isNotNull();
-    assertThat(delegateGroupDetails.getDelegateInsightsDetails().getInsights()).hasSize(2);
   }
 
   @Test
@@ -660,8 +656,6 @@ public class DelegateSetupServiceTest extends DelegateServiceTestBase {
     assertThat(delegateGroupDetails.getDelegateInstanceDetails())
         .extracting(DelegateGroupListing.DelegateInner::isActivelyConnected)
         .containsOnly(true, true);
-    assertThat(delegateGroupDetails.getDelegateInsightsDetails()).isNotNull();
-    assertThat(delegateGroupDetails.getDelegateInsightsDetails().getInsights()).hasSize(2);
   }
 
   @Test
