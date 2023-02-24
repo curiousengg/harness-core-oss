@@ -1,5 +1,5 @@
 # to be used when building in Jenkins
-FROM openjdk:8u242-jre
+FROM openjdk:8u342-jre
 
 RUN apt-get update
 RUN apt install -y traceroute
