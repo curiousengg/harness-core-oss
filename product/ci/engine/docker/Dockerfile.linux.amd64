@@ -4,7 +4,7 @@
 # > bazel build --platforms=@io_bazel_rules_go//go/toolchain:linux_amd64 //product/ci/engine:engine
 # > docker build -t harness/ci-lite-engine:<tag> -f product/ci/engine/Dockerfile $(bazel info bazel-bin)/product/ci/engine/
 
-FROM redhat/ubi8-minimal
+FROM redhat/ubi8-minimal:8.8-1072.1697626218
 RUN microdnf update \
     && microdnf install \
     shadow-utils \
