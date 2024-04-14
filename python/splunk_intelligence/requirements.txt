@@ -25,7 +25,7 @@ functools32==3.2.3.post2
 futures==3.2.0
 gensim==3.4.0
 html5lib==1.0.1
-idna==2.7
+idna==3.7
 imagesize==1.0.0
 ipaddress==1.0.22
 ipykernel==4.8.2
