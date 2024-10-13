@@ -9,3 +9,10 @@ google-cloud-bigquery-datatransfer
 boto3==1.17.24
 google-cloud-pubsub==2.5.0
 google-api-python-client
+certifi>=2024.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
+grpcio>=1.53.2 # not directly required, pinned by Snyk to avoid a vulnerability
+idna>=3.7 # not directly required, pinned by Snyk to avoid a vulnerability
+protobuf>=3.18.3 # not directly required, pinned by Snyk to avoid a vulnerability
+requests>=2.31.0 # not directly required, pinned by Snyk to avoid a vulnerability
+rsa>=4.7 # not directly required, pinned by Snyk to avoid a vulnerability
+setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
